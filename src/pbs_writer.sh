@@ -9,11 +9,15 @@
 ### wrapper script for generating PBS requests
 
 # ---------------------------------------------------------------------------
-# (0) Supply arguments to script from the command line
+# Supply arguments to script from the command line
 # ---------------------------------------------------------------------------
 ## default values
 # number of threads for trimmomatic
 THREADS=8
+EMAIL=hilldr@med.umich.edu
+PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
+PBS_o=$(pwd)\/PBS_Log/
+SCRIPT=test.sh
 
 ## user-supplied values (will overwrite defaults)
 ## format: '--threads=8'
@@ -25,26 +29,41 @@ case $i in
     THREADS="${i#*=}"
     shift # past argument=value
     ;;
+    -e=*|--email=*)
+    EMAIL="${i#*=}"
+    shift # past argument=value
+    ;;
+    -l=*|--pbs_l=*)
+    PBS_l="${i#*=}"
+    shift # past argument=value
+    ;;
+    -o=*|--pbs_o=*)
+    PBS_o="${i#*=}"
+    shift # past argument=value
+    ;;
+
 esac
 done
-echo "THREADS  = ${THREADS}"
 
-cat << EOF > pbs_test.sh
-### Run script (QualityControl1_FastQCpre.sh) on high-performance computing
+# ---------------------------------------------------------------------------
+# Main text of PBS script
+# ---------------------------------------------------------------------------
+cat << EOF > ${SCRIPT%.*}.pbs
+### Run script ($SCRIPT) on high-performance computing
 ### ------------------------------------------------------------------------
 ### Start of the PBS directives
 ### Output and error file by default will be copied -o
 
 #PBS -S /bin/sh
-#PBS -N QualityControl1_FastQCpre
-#PBS -l nodes=1:ppn=8,pmem=8gb,walltime=24:00:00
+#PBS -N ${SCRIPT%.*}
+#PBS -l $PBS_l
 #PBS -A youngvi_fluxm
 #PBS -l qos=flux
 #PBS -q fluxm
-#PBS -M rjcieza@med.umich.edu
+#PBS -M $EMAIL
 #PBS -m abe
 #PBS -j oe
-#PBS -o /scratch/youngvi_fluxm/rjcieza/projects/NEC/src/PBS_Log/
+#PBS -o $PBS_o
 #PBS -V
 
 ### End of PBS directives
@@ -74,13 +93,26 @@ echo \$PBS_JOBID
 echo \$PBS_JOBNAME
 ### ------------------------------------------------------------------------
 
-### Define Project name variable:
-Project=NEC
-### Define scritpt name variable:
-Script=QualityControl1_FastQCpre.sh
+### Define script name variable:
+Script=$SCRIPT
 ### Run your script (.sh)
-mkdir -p /scratch/youngvi_fluxm/rjcieza/projects/$Project/src/PBS_Log/
-sh /scratch/youngvi_fluxm/rjcieza/projects/$Project/src/$Script
+# make directory for PBS log file
+mkdir -p $PBS_o
+sh $(pwd)/$SCRIPT
 EOF
 
-cat pbs_test.sh
+## print pbs script to STDOUT
+cat ${SCRIPT%.*}.pbs
+
+## prompt user input to proceed to qsub
+while true; do
+    echo -e "--- END OF ${SCRIPT%.*}.pbs ---\n"
+    read -p "Please review the PBS file above...`echo $'\n> '` Is this PBS file ready to submit [y/n]?" yn
+    case $yn in
+        [Yy]* )
+	    echo "qsub ${SCRIPT%.*}.pbs"
+	    break;;
+	[Nn]* ) exit;;
+        * ) echo "Please answer y or n.";;
+    esac
+done
