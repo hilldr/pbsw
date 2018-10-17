@@ -14,8 +14,21 @@
 ## default values
 # number of threads for trimmomatic
 THREADS=8
-EMAIL=hilldr@med.umich.edu
-PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
+
+# set value of EMAIL in env 'export EMAIL="d2.david.hill@gmail.com"'
+# check if email set
+if [ -z "$EMAIL" ]
+then
+    ## if not set, provide default
+    EMAIL=hilldr@med.umich.edu
+fi
+
+if [ -z "$PBS_l" ]
+then
+    ## if not set, provide default
+    PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
+fi
+
 PBS_o=$(pwd)\/PBS_Log/
 SCRIPT=test.sh
 
@@ -41,6 +54,10 @@ case $i in
     PBS_o="${i#*=}"
     shift # past argument=value
     ;;
+    -s=*|--script=*)
+    SCRIPT="${i#*=}"
+    shift # past argument=value
+    ;;
 
 esac
 done
@@ -48,6 +65,7 @@ done
 # ---------------------------------------------------------------------------
 # Main text of PBS script
 # ---------------------------------------------------------------------------
+echo -e "\n--- BEGINNING OF ${SCRIPT%.*}.pbs ---\n"
 cat << EOF > ${SCRIPT%.*}.pbs
 ### Run script ($SCRIPT) on high-performance computing
 ### ------------------------------------------------------------------------
@@ -106,7 +124,7 @@ cat ${SCRIPT%.*}.pbs
 
 ## prompt user input to proceed to qsub
 while true; do
-    echo -e "--- END OF ${SCRIPT%.*}.pbs ---\n"
+    echo -e "\n--- END OF ${SCRIPT%.*}.pbs ---\n"
     read -p "Please review the PBS file above...`echo $'\n> '` Is this PBS file ready to submit [y/n]?" yn
     case $yn in
         [Yy]* )
