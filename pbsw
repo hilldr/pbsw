@@ -114,10 +114,9 @@ then
     PBS_o=$(pwd)\/PBS_Log/
 fi
 
-
-
-SCRIPT=test.sh
-
+# input script to submit as PBS script
+# ---------------------------------------------------------------------------
+SCRIPT=$1
 
 # ---------------------------------------------------------------------------
 # Main text of PBS script
