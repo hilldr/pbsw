@@ -42,25 +42,42 @@ case $i in
 esac
 done
 
-## default values
-# number of threads for trimmomatic
-THREADS=8
+## Set up hierarchy for variable input
+## CLI input always overrides config files
+## config files override defaults
 
 # set value of EMAIL in env 'export PBSW_EMAIL="d2.david.hill@gmail.com"'
-# check if email set
+# check if email provided
 if [ -z "$EMAIL" ]
 then
-    ## if not set, provide default
+    ## if not set, prompt user input
    read -e -p "Please provide an email address: " EMAIL
 fi
 
+# check if number of threads provided
+if [ -z "$THREADS" ]
+then
+    ## if not set, use the maximum number available
+    THREADS=$(grep -c ^processor /proc/cpuinfo)
+fi
+
+# check if values for '# PBS -l' have been provided
 if [ -z "$PBS_l" ]
 then
     ## if not set, provide default
     PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
 fi
 
-PBS_o=$(pwd)\/PBS_Log/
+# check if values for '# PBS -o' have been provided
+if [ -z "$PBS_o" ]
+then
+    ## if not set, provide default to subdirectory 'PBS_Log'
+    ## within current working directory
+    PBS_o=$(pwd)\/PBS_Log/
+fi
+
+
+
 SCRIPT=test.sh
 
 
