@@ -1,3 +1,3 @@
-# About this repository
+# PBS script Writer (PBSW)
 
-This repository will be used to document genomic analysis of E. coli strains from WashU
+This bash script generates PBS job scripts based on user-specified inputs
