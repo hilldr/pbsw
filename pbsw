@@ -2,7 +2,7 @@
 ## David R. Hill 2018-10-17
 
 ### -------------------------------------------------------------------------
-### Script:       pbs_writer.sh
+### Script:       pbsw
 ### Written by:   Hill DR
 ### -------------------------------------------------------------------------
 
@@ -11,28 +11,8 @@
 # ---------------------------------------------------------------------------
 # Supply arguments to script from the command line
 # ---------------------------------------------------------------------------
-## default values
-# number of threads for trimmomatic
-THREADS=8
 
-# set value of EMAIL in env 'export EMAIL="d2.david.hill@gmail.com"'
-# check if email set
-if [ -z "$EMAIL" ]
-then
-    ## if not set, provide default
-    EMAIL=hilldr@med.umich.edu
-fi
-
-if [ -z "$PBS_l" ]
-then
-    ## if not set, provide default
-    PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
-fi
-
-PBS_o=$(pwd)\/PBS_Log/
-SCRIPT=test.sh
-
-## user-supplied values (will overwrite defaults)
+## user-supplied values (will overwrite configs and defaults)
 ## format: '--threads=8'
 ## https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash#
 for i in "$@"
@@ -61,6 +41,28 @@ case $i in
 
 esac
 done
+
+## default values
+# number of threads for trimmomatic
+THREADS=8
+
+# set value of EMAIL in env 'export PBSW_EMAIL="d2.david.hill@gmail.com"'
+# check if email set
+if [ -z "$EMAIL" ]
+then
+    ## if not set, provide default
+   read -e -p "Please provide an email address: " EMAIL
+fi
+
+if [ -z "$PBS_l" ]
+then
+    ## if not set, provide default
+    PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
+fi
+
+PBS_o=$(pwd)\/PBS_Log/
+SCRIPT=test.sh
+
 
 # ---------------------------------------------------------------------------
 # Main text of PBS script
