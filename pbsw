@@ -47,38 +47,65 @@ done
 ## CLI input always overrides config files
 ## config files override defaults
 
-# set value of EMAIL in env 'export PBSW_EMAIL="d2.david.hill@gmail.com"'
+# EMAIL
+# ---------------------------------------------------------------------------
 # check if email provided
 if [ -z "$EMAIL" ]
 then
-    ## if not set then check for config file
-    source .pbswrc
-
+    ## if not set grep parameter from config file
+    CONFIG=$(grep EMAIL= .pbswrc)
+    eval $CONFIG
+    
     if [ -z "$EMAIL" ]
     then
-    ## if not set, prompt user input
+    ## if not set in config file, prompt user input
 	read -e -p "Please provide an email address: " EMAIL
 	
     else
-	## if email present in config, inform user
-	echo "Using EMAIL from .pbswrc: " $EMAIL
+	## if present in config, inform user
+	echo "[EMAIL] found in .pbswrc: " $EMAIL
     fi
 fi
 
+# THREADS
+# ---------------------------------------------------------------------------
 # check if number of threads provided
 if [ -z "$THREADS" ]
 then
-    ## if not set, use the maximum number available
-    THREADS=$(grep -c ^processor /proc/cpuinfo)
+    ## if not set grep parameter from config file
+    CONFIG=$(grep THREADS= .pbswrc)
+    eval $CONFIG
+
+    if [ -z "$THREADS" ]
+    then
+	## if not set, use the maximum number available
+	THREADS=$(grep -c ^processor /proc/cpuinfo)
+    fi
 fi
 
+# PBS_l
+# ---------------------------------------------------------------------------
 # check if values for '# PBS -l' have been provided
 if [ -z "$PBS_l" ]
 then
-    ## if not set, provide default
-    PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
+    ## if not set then check for config file
+    CONFIG=$(grep PBS_l= .pbswrc)
+    eval $CONFIG
+
+    if [ -z "PBS_l" ]
+    then
+	## if not set, provide default & inform user
+	PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
+	echo "Applying default values for '# PBS -l'"
+	
+    else
+	## if email present in config, inform user
+	echo "[PBS_l] found in .pbswrc: " $PBS_l
+    fi
 fi
 
+# PBS_o
+# ---------------------------------------------------------------------------
 # check if values for '# PBS -o' have been provided
 if [ -z "$PBS_o" ]
 then
