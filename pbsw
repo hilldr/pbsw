@@ -17,10 +17,6 @@
 for i in "$@"
 do
 case $i in
-    -t=*|--threads=*)
-    THREADS="${i#*=}"
-    shift # past argument=value
-    ;;
     -e=*|--email=*)
     EMAIL="${i#*=}"
     shift # past argument=value
@@ -31,10 +27,6 @@ case $i in
     ;;
     -o=*|--pbs_o=*)
     PBS_o="${i#*=}"
-    shift # past argument=value
-    ;;
-    -s=*|--script=*)
-    SCRIPT="${i#*=}"
     shift # past argument=value
     ;;
 
@@ -64,22 +56,6 @@ then
     else
 	## if present in config, inform user
 	echo "[EMAIL] found in .pbswrc: " $EMAIL
-    fi
-fi
-
-# THREADS
-# ---------------------------------------------------------------------------
-# check if number of threads provided
-if [ -z "$THREADS" ]
-then
-    ## if not set grep parameter from config file
-    CONFIG=$(grep THREADS= .pbswrc)
-    eval $CONFIG
-
-    if [ -z "$THREADS" ]
-    then
-	## if not set, use the maximum number available
-	THREADS=$(grep -c ^processor /proc/cpuinfo)
     fi
 fi
 
