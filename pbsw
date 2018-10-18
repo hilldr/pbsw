@@ -11,7 +11,6 @@
 # ---------------------------------------------------------------------------
 # Supply arguments to script from the command line
 # ---------------------------------------------------------------------------
-
 ## user-supplied values (will overwrite configs and defaults)
 ## format: '--threads=8'
 ## https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash#
@@ -42,7 +41,9 @@ case $i in
 esac
 done
 
-## Set up hierarchy for variable input
+# ---------------------------------------------------------------------------
+# Set up hierarchy for variable input
+# ---------------------------------------------------------------------------
 ## CLI input always overrides config files
 ## config files override defaults
 
@@ -50,8 +51,18 @@ done
 # check if email provided
 if [ -z "$EMAIL" ]
 then
+    ## if not set then check for config file
+    source .pbswrc
+
+    if [ -z "$EMAIL" ]
+    then
     ## if not set, prompt user input
-   read -e -p "Please provide an email address: " EMAIL
+	read -e -p "Please provide an email address: " EMAIL
+	
+    else
+	## if email present in config, inform user
+	echo "Using EMAIL from .pbswrc: " $EMAIL
+    fi
 fi
 
 # check if number of threads provided
