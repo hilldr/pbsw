@@ -160,7 +160,7 @@ while true; do
     read -p "Please review the PBS file above...`echo $'\n> '` Is this PBS file ready to submit [y/n]?" yn
     case $yn in
         [Yy]* )
-	    echo "qsub ${SCRIPT%.*}.pbs"
+	    qsub ${SCRIPT%.*}.pbs
 	    break;;
 	[Nn]* ) exit;;
         * ) echo "Please answer y or n.";;
