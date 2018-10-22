@@ -94,6 +94,9 @@ fi
 # ---------------------------------------------------------------------------
 SCRIPT=$1
 
+# supply string to provide arguments for $SCRIPT
+ARGUMENTS=$2
+
 # ---------------------------------------------------------------------------
 # Main text of PBS script
 # ---------------------------------------------------------------------------
@@ -148,7 +151,7 @@ Script=$SCRIPT
 ### Run your script (.sh)
 # make directory for PBS log file
 mkdir -p $PBS_o
-sh $(pwd)/$SCRIPT
+sh $(pwd)/$SCRIPT $ARGUMENTS
 EOF
 
 ## print pbs script to STDOUT
