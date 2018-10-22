@@ -1,0 +1,58 @@
+#!/bin/sh
+
+### -------------------------------------------------------------------------
+### Script:       QualityControl3_Trim.pbs
+### Written by:   Cieza RJ
+### -------------------------------------------------------------------------
+
+### Run script (QualityControl3_Trim.sh) on high-performance computing
+### ------------------------------------------------------------------------
+### Start of the PBS directives
+### Output and error file by default will be copied -o
+
+#PBS -S /bin/sh
+#PBS -N QualityControl3_Trim
+#PBS -l nodes=1:ppn=8,pmem=12gb,walltime=24:00:00
+#PBS -A youngvi_fluxm
+#PBS -l qos=flux
+#PBS -q fluxm
+#PBS -M rjcieza@med.umich.edu
+#PBS -m abe
+#PBS -j oe
+#PBS -o /scratch/youngvi_fluxm/rjcieza/projects/NEC/src/PBS_Log/
+#PBS -V
+
+### End of PBS directives
+
+### ------------------------------------------------------------------------
+### Switch to the working directory ($PBS_O_WORKDIR);
+### by default TORQUE launches processes from your home directory.
+cd $PBS_O_WORKDIR
+echo Running from $PBS_O_WORKDIR
+### ------------------------------------------------------------------------
+### Calculate the number of processors allocated to this run.
+NPROCS=`wc -l < $PBS_NODEFILE`
+### Calculate the number of nodes allocated.
+NNODES=`uniq $PBS_NODEFILE | wc -l`
+### ------------------------------------------------------------------------
+### Display the job context
+echo Running on host `hostname`
+echo Time is `date`
+echo Directory is `pwd`
+echo Using ${NPROCS} processors across ${NNODES} nodes
+echo "I ran on:"
+cat $PBS_NODEFILE
+### ------------------------------------------------------------------------
+## Display the job information
+echo 'Job identifiers are'
+echo $PBS_JOBID
+echo $PBS_JOBNAME
+### ------------------------------------------------------------------------
+
+### Define Project name variable:
+Project=NEC
+### Define scritpt name variable:
+Script=QualityControl3_Trim.sh
+### Run your script (.sh)
+mkdir -p /scratch/youngvi_fluxm/rjcieza/projects/$Project/src/PBS_Log/
+sh /scratch/youngvi_fluxm/rjcieza/projects/$Project/src/$Script
