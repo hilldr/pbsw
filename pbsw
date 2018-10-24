@@ -68,7 +68,7 @@ then
     CONFIG=$(grep PBS_l= .pbswrc)
     eval $CONFIG
 
-    if [ -z "PBS_l" ]
+    if [ -z "$PBS_l" ]
     then
 	## if not set, provide default & inform user
 	PBS_l="nodes=1:ppn=8,pmem=8gb,walltime=24:00:00"
